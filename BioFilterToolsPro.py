@@ -1,5 +1,5 @@
-from modules import module_rna_dna_tools as tools
-from modules import module_filter_fastq as module_filter
+import module_rna_dna_tools as tools
+import module_filter_fastq as module_filter
 import os
 from typing import Union
 
@@ -114,6 +114,11 @@ def filter_fastq(input_fastq: str,
             return
     else:
         return
+    if not output_fastq:
+        filtered_dir = os.path.join(os.getcwd(), 'filtered')
+        if not os.path.exists(filtered_dir):
+            os.makedirs(filtered_dir)
+        output_fastq = os.path.join(filtered_dir, 'filtered_sequences.fastq')
     if os.path.exists(output_fastq):
         print(f"Error: file '{output_fastq}' already exists.")
         return
