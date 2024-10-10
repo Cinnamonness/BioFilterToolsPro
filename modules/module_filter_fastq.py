@@ -77,9 +77,9 @@ def write_fastq(output_fastq: str,
     The function writes the sequence
     information to the FASTQ file.
     """
-    filtered_dir = os.path.join(os.getcwd(), 'filtered')
-    if not os.path.exists(filtered_dir):
-        os.makedirs(filtered_dir)
-    output_fastq_path = os.path.join(filtered_dir, output_fastq)
-    with open(output_fastq_path, 'a') as f:
+    output_dir = os.path.dirname(output_fastq)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    with open(output_fastq, 'a') as f:
         f.write(f"{sequence_name}\n{sequence}\n{comment}\n{quality}\n")
