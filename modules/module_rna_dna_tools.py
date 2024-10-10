@@ -6,9 +6,7 @@ This module contains procedures for working with RNA and DNA sequences.
 def molecule_type(sequence: str):
     """
     Function to determine the type of molecule.
-
     :param sequence: str.
-
     :return: 'DNA' or 'RNA'.
     """
     seq = set(sequence)
@@ -23,9 +21,7 @@ def molecule_type(sequence: str):
 def transcribe(sequence: str) -> str:
     """
     Function to determine transcribed sequence.
-
     :param sequence: str.
-
     :return: str.
     """
     return sequence.replace('t', 'u').replace('T', 'U')
@@ -34,9 +30,7 @@ def transcribe(sequence: str) -> str:
 def reverse(sequence: str) -> str:
     """
     Function to reverse the sequence.
-
     :param sequence: str.
-
     :return: str.
     """
     return sequence[::-1]
@@ -45,9 +39,7 @@ def reverse(sequence: str) -> str:
 def complement(sequence: str) -> str:
     """
     Function to determine complement sequence.
-
     :param sequence: str.
-
     :return: str.
     """
     dna_map = str.maketrans('ATGCatgc', 'TACGtacg')
@@ -62,9 +54,7 @@ def complement(sequence: str) -> str:
 def reverse_complement(sequence: str) -> str:
     """
     Function to determine reverse complement sequence.
-
     :param sequence: str.
-
     :return: str.
     """
     return reverse(complement(sequence))

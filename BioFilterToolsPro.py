@@ -1,5 +1,7 @@
-from modules import module_rna_dna_tools as tools
-from modules import module_filter_fastq as module_filter
+import module_rna_dna_tools as tools
+import module_filter_fastq as module_filter
+import os
+from typing import Union
 
 """
 The utility for working with DNA and RNA and of
@@ -8,8 +10,8 @@ This utility provides two main functions:
 1. Operations on the transmitted DNA or RNA sequences:
 transcription, reversing, complementing, reversing
 complementing, identifying the molecule type.
-2. Filtering FASTQ sequences based on GC-content, length
-and quality score.
+2. Filtering FASTQ sequences in FASTQ file
+based on GC-content, length and quality score.
 
 Modules:
 1. module_rna_dna_tools: contains the operations on the
@@ -54,12 +56,13 @@ def run_dna_rna_tools(*arguments):
     return res[0] if len(res) == 1 else res
 
 
-def filter_fastq(seqs: dict[str, tuple[str, str]],
-                 gc_bounds: tuple[float, float] | float = (0, 100),
-                 length_bounds: tuple[int, int] | int = (0, 2**32),
-                 quality_threshold: float = 0) -> dict[str, tuple[str, str]]:
+def filter_fastq(input_fastq: str,
+                 output_fastq: str,
+                 gc_bounds: Union[tuple[float, float], float] = (0, 100),
+                 length_bounds: Union[tuple[int, int], int] = (0, 2 ** 32),
+                 quality_threshold: float = 0) -> None:
     """
-    This utility filter a dictionary of FASTQ sequences
+    This utility filter a file of FASTQ sequences
     based on GC content, sequence length, and
     quality threshold.
     Criteria for filtering:
@@ -70,10 +73,12 @@ def filter_fastq(seqs: dict[str, tuple[str, str]],
     3. Quality threshold: sequences must fall within
     the specified quality.
     Args:
-    :param seqs: (dict[str, tuple[str, str]]):
-    A dictionary where the key is the sequence name
-    and the value is a tuple which contains the sequence (str)
-    and the quality (str).
+    :param input_fastq: str:
+    The input FASTQ file path containing
+    the sequences to be filtered.
+    :param output_fastq: str:
+    The output FASTQ file path where filtered
+    sequences will be saved.
     :param gc_bounds: tuple[float, float] | float = (0, 100):
     A tuple containing the lower and upper bound of the
     GC content percentage.
@@ -89,10 +94,11 @@ def filter_fastq(seqs: dict[str, tuple[str, str]],
     :param quality_threshold: float = 0:
     Contain the minimum average quality score of the sequence.
     Default value is 0, which means no quality score is considered.
-    :return: dict[str, tuple[str, str]]:
-    A dictionary of filtered sequences where the key is
-    the sequence name and the value is a tuple which contains
-    the sequence (str) and the quality (str).
+    :return: None: The function writes the filtered sequences
+    directly to the specified output FASTQ file.
+    Raises:
+    FileExistsError: If the output file already exists,
+    a message will be printed, and the function will exit.
     """
     if isinstance(gc_bounds, float):
         gc_bounds = (0.0, gc_bounds)
@@ -100,16 +106,23 @@ def filter_fastq(seqs: dict[str, tuple[str, str]],
         if len(gc_bounds) == 1:
             gc_bounds = (0.0, gc_bounds[0])
     else:
-        return {}
+        return
     if isinstance(length_bounds, int):
         length_bounds = (0, length_bounds)
     elif isinstance(length_bounds, tuple):
         if len(length_bounds) != 2:
-            return {}
+            return
     else:
-        return {}
-    filtered_seqs = {}
-    for name, (sequence, quality) in seqs.items():
+        return
+    if not output_fastq:
+        filtered_dir = os.path.join(os.getcwd(), 'filtered')
+        if not os.path.exists(filtered_dir):
+            os.makedirs(filtered_dir)
+        output_fastq = os.path.join(filtered_dir, 'filtered_sequences.fastq')
+    if os.path.exists(output_fastq):
+        print(f"Error: file '{output_fastq}' already exists.")
+        return
+    for name, sequence, comment, quality in module_filter.read_fastq(input_fastq):
         gc_content = module_filter.calculate_gc_content(sequence)
         if not (gc_bounds[0] <= gc_content <= gc_bounds[1]):
             continue
@@ -119,5 +132,4 @@ def filter_fastq(seqs: dict[str, tuple[str, str]],
         average_quality = module_filter.quality_calculation(quality)
         if average_quality < quality_threshold:
             continue
-        filtered_seqs[name] = (sequence, quality)
-    return filtered_seqs
+        module_filter.write_fastq(output_fastq, name, sequence, comment, quality)
