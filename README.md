@@ -225,6 +225,8 @@ if __name__ == "__main__":
 
 **BioFilterToolsPro** — is a utility designed to work with DNA and RNA sequences, as well as to filter sequences in FASTQ file based on GC composition, reed length and the threshold value of the average reed quality (phred33 scale).
 
+**bio_files_processor** - is an additional utility for working with some common biological data formats (FASTA files, output files from the BLAST program in .txt format, genome annotations in .gbk format).
+
 Authors:
 * **Software:** *Karitskaya Polina* <cinnamonness@gmail.com>, <br/>
 Institute of Bioinformatics, Saint-Petersburg, Russia. 
