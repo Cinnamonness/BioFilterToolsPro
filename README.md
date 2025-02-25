@@ -6,7 +6,7 @@
 
 ### russian version
 
-**BioFilterToolsPro** — это утилита, предназначенная для работы с последовательностями ДНК и РНК, а также для фильтрации последовательностей FASTQ-файла на основе GC-состава, длины рида и порогового значения среднего качества рида (шкала phred33). 
+**BioFilterToolsPro** — это утилита, предназначенная для работы с последовательностями ДНК, РНК и белков, а также для фильтрации последовательностей FASTQ-файла на основе GC-состава, длины рида и порогового значения среднего качества рида (шкала phred33). 
 
 **bio_files_processor** - дополнительная утилита для работы с некоторыми распространенными форматами биологических данных (fasta-файлы, выходные файлы программы BLAST в формате .txt, геномные аннотации .gbk).
 
@@ -34,7 +34,6 @@
 git clone git@github.com:Cinnamonness/BioFilterToolsPro.git
 cd BioFilterToolsPro
 ```
-Необходимые модули для работы (`module_rna_dna_tools`, `module_filter_fastq`) находятся внутри директории этого проекта. 
 
 ---
 
@@ -75,95 +74,111 @@ cd BioFilterToolsPro
 
 ## Системные требования
 - Python 3.x
-- Необходимые модули:
-    - `module_rna_dna_tools`
-    - `module_filter_fastq`
+- Необходимые библиотеки из requirements.txt
 
 ---
 
 ## Пример использования: 
 
-### Пример работы `run_dna_rna_tools`
+### Пример работы с ДНК последовательностями:
 ```Python
-if __name__ == "__main__":
-    arguments = ('ATG', 'aT', 'reverse')
-    result = run_dna_rna_tools(*arguments)
-    print("Result of run_dna_rna_tools:", result)
+dna = DNASequence("ATGCGA")
+print(dna)
+print(dna[1:4])
+print(dna[1::])
+print(dna.complement())
+print(dna.reverse())
+print(dna.reverse_complement())
+print(dna.transcribe())
 ```
 ```Python
-Result of run_dna_rna_tools: ['GTA', 'Ta']
+Sequence: ATGCGA
+Sequence: TGC
+Sequence: TGCGA
+Sequence: TACGCT
+Sequence: AGCGTA
+Sequence: TCGCAT
+Sequence: AUGCGA
 ```
+
+### Пример работы с РНК последовательностями:
+```Python
+rna = RNASequence("AUGCGA")
+print(str(rna))        
+print(rna[1:4])
+print(rna[1::])
+print(rna.complement())
+print(rna.reverse())
+print(rna.reverse_complement())
+```
+```Python
+Sequence: AUGCGA
+Sequence: UGC
+Sequence: UGCGA
+Sequence: UACGCU
+Sequence: AGCGUA
+Sequence: UCGCAU
+```
+
+### Пример работы с белковыми последовательностями:
+```Python
+aa_seq = AminoAcidSequence("GALNQRHKTTYCC")
+print(aa_seq)
+print(aa_seq[1:4])
+print(aa_seq[1::])
+print(aa_seq.classify_aminoacids())
+```
+```Python
+Sequence: GALNQRHKTTYCC
+Sequence: ALN
+Sequence: ALNQRHKTTYCC
+non-polar: Count = 3, Percentage = 23.08%
+polar uncharged: Count = 7, Percentage = 53.85%
+polar negatively charged: Count = 0, Percentage = 0.00%
+polar positively charged: Count = 3, Percentage = 23.08%
+```
+
 ### Пример работы `filter_fastq`
 ```Python
 if __name__ == "__main__":
-    arguments = ('C:/Users/User/PycharmProjects/some_scripts/example_fastq.fastq', '',
-                 (50, 70), (20,50), 20)
+    arguments = ("../data/example.fastq", 
+             output_fastq='../data/filtered.fastq',
+             gc_bounds=(0, 80),
+             length_bounds=(0, 500),
+             quality_threshold=40)
     result = filter_fastq(*arguments)
 ```
-В результате работы функции `filter_fastq` в директории ./filtered сохранится файл filtered_sequences.fastq с отфильтрованными последовательностями из изначального файла example_fastq.fastq.
-Если директории filtered ранее не существовала, то она будет создана в текущей директории. 
+В результате работы функции `filter_fastq` в директории ./data сохранится файл filtered.fastq с отфильтрованными последовательностями из изначального файла example.fastq. 
 
 ***Исходный example_fastq.fastq***
 ```Python
-@SRX079804:1:SRR292678:1:1101:278698:278698 1:N:0:1 BH:ok
-CTAATAATGGTAATTGAACCATAGAAGATAAGTTCATAATGTAATAAATACATCCATAGAGTTATTAA
-+SRX079804:1:SRR292678:1:1101:278698:278698 1:N:0:1 BH:ok
-DDBDBCCCDD@FFFB9<<<@DA=DA@B:@=@@AC@GGFCGECFFDGGCGFFGGFFCEBF9>?@>BDFF
-@SRX079804:1:SRR292678:1:1101:918742:918742 1:N:0:1 BH:failed
-CTCTCCATGCACAAAGAATATCACAGCCAAA
-+SRX079804:1:SRR292678:1:1101:918742:918742 1:N:0:1 BH:failed
-EEEBA?@;B@EEE@BEE=?EDDDDADCDA?E
-@SRX079804:1:SRR292678:1:1101:923787:923787 2:N:0:1 BH:ok
-TTGTGAAGGATGGGATATTAGTGTAGATGA
-+SRX079804:1:SRR292678:1:1101:923787:923787 2:N:0:1 BH:ok
-EEBBEGEEE=BBB<@DCDCGD@D>=DEGEE
-@SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-GTCTGCACTATCGAGGGCTGTGCCTTTGC
-+SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-FEFFDBFF8FE>?DFFFCEBCEEBBEDE6
-@SRX079804:1:SRR292678:1:1101:937136:937136 1:N:0:1 BH:failed
-TTTCTTTGGCTTAAAGATAGTTTTAGTC
-+SRX079804:1:SRR292678:1:1101:937136:937136 1:N:0:1 BH:failed
-EFFFEEEEFCBCDDDDE@/E?@@7@@3<
-@SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-TGCCGTGGGAATGACAAACAAGCATCC
-+SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-DECC@GFFBF=EBEAFDFGD?FFF8FF
-@SRX079804:1:SRR292678:1:1101:940693:940693 1:N:0:1 BH:failed
-CACATTATGAACTATGGGCACTGCAT
-+SRX079804:1:SRR292678:1:1101:940693:940693 1:N:0:1 BH:failed
-EEEGFDEDFEGGGGGFEGBGGGFGGG
-@SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-CACCTAGCAGCAACGGACGAGTCAG
-+SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-GGGGGEEEGGEGGGFGEGG;F@EFF
-@SRX079804:1:SRR292678:1:1101:958051:958051 2:N:0:1 BH:ok
-TTAATATTTCCATCTGAACTTCGC
-+SRX079804:1:SRR292678:1:1101:958051:958051 2:N:0:1 BH:ok
-EDDBGFEGFGHHFHGGEDEGBGDB
-@SRX079804:1:SRR292678:1:1101:996098:996098 1:N:0:1 BH:failed
-CTAAGAGAGTTTGTAATGCGGAC
-+SRX079804:1:SRR292678:1:1101:996098:996098 1:N:0:1 BH:failed
-DD=DBDBDC4EFFFD@?CD@ACD
-@SRX079804:1:SRR292678:1:1101:1020278:1020278 2:N:0:1 BH:ok
-AAAGTGCAGAACATGCAGATAT
-+SRX079804:1:SRR292678:1:1101:1020278:1020278 2:N:0:1 BH:ok
-D>AC?GDDCD?DDADE@GABDG
+@K00271:89:HHWWNBBXX:2:1101:23277:1068 1:N:0:CAGATC
+NATCGGAAGAGCACACGTCTGAACTCCAGTCACCAGATCATCTCGTATGCCGTCTTCTGCTTGAAAAAAAAAAATCTCAGACAACAAATCACAGAGTTAAGTCAGTTTACCGCACAAACTNACCAAGTCGGCGAAACAGAAGGTGGCGAC
++
+#AAAFFJJFJJFJJJJF-FFFJJFJJJJFJJJJFJJFAFJF-FFJFJFJJJJ7A<FFJJJFAJF<<-JJJFJJF----FA--7-A-7------7A-7----7FJ----7---7-7A-AF-#A<---7---7A-F)-7AA<--77-)--)-
+@K00271:89:HHWWNBBXX:2:1101:16792:1121 1:N:0:CAGATC
+NGGAAACCGTCGGTTCTGGTTGTGGAGGCGGTTGGTGGTGGCTGTGGATTGGGAAGATGGTTTGGTAAGTTTTGGGCCGGTTTCAAGAAACTAAGCTGGGCTGGGCTGGGCTGGGCTGGGCTAAGCTGGGCTCACGAACCAAGTAAAGTT
++
+#AAFFJJJJJJJJJJJJJJFFJFJJJJJFJJ-FFJFFJFJJJJJJJJFFFJJJ<<JF<FJ<FJJJFFJJJJFJJJJJJJJ-AJJFJJJAJJFJJJJFJJJJJJFFJJJJJJFJJJJJJJJJ-AFJFJJJJJFFAJJ-AFJJJFF-7F<77
+@K00271:89:HHWWNBBXX:2:1101:18609:1173 1:N:0:CAGATC
+NTGAACCTCCAAATTGATTAGAGAGTCACATGCAAATCACTGTTAAAGTCCGACAAACAGTTTACAAGTAACTTTAATTGAATGCCCGAAAATCTTTTAAATGTTCAGACAATACGATGACGATGACAGTTATAAGCGAAACCACTGAGA
++
+#AAFFJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FJJJFJFJJJJJJJFJJJJFJJFJJJF
+@K00271:89:HHWWNBBXX:2:1101:19898:1226 1:N:0:CAGATC
+NTGATGACTGTTGCCAAACAATTTGGGAATTCTAGATGGGATTCGAGTTTAGTTTTGGAGTGAGCCTTATAATTTTGGTTCATCAAGGTCAATAAGGATACACTCCCACATTGGTGTTCATTGGGTTAATTTTGGAGTGCCACTCACACC
++
+#AAFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FFJJFFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJAJFJJJJJJJJJJJFJJFJJJJJJJJJJJJJJJJJJ
 ```
 ***Отфильтрованный filtered_sequences.fastq***
 ```Python
-@SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-GTCTGCACTATCGAGGGCTGTGCCTTTGC
-+SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-FEFFDBFF8FE>?DFFFCEBCEEBBEDE6
-@SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-TGCCGTGGGAATGACAAACAAGCATCC
-+SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-DECC@GFFBF=EBEAFDFGD?FFF8FF
-@SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-CACCTAGCAGCAACGGACGAGTCAG
-+SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-GGGGGEEEGGEGGGFGEGG;F@EFF
+@K00271:89:HHWWNBBXX:2:1101:18609:1173 1:N:0:CAGATC
+NTGAACCTCCAAATTGATTAGAGAGTCACATGCAAATCACTGTTAAAGTCCGACAAACAGTTTACAAGTAACTTTAATTGAATGCCCGAAAATCTTTTAAATGTTCAGACAATACGATGACGATGACAGTTATAAGCGAAACCACTGAGA
++
+#AAFFJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FJJJFJFJJJJJJJFJJJJFJJFJJJF
+@K00271:89:HHWWNBBXX:2:1101:19898:1226 1:N:0:CAGATC
+NTGATGACTGTTGCCAAACAATTTGGGAATTCTAGATGGGATTCGAGTTTAGTTTTGGAGTGAGCCTTATAATTTTGGTTCATCAAGGTCAATAAGGATACACTCCCACATTGGTGTTCATTGGGTTAATTTTGGAGTGCCACTCACACC
++
+#AAFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FFJJFFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJAJFJJJJJJJJJJJFJJFJJJJJJJJJJJJJJJJJJ
 ```
 ### Пример работы `convert_multiline_fasta_to_oneline` из ***bio_files_processor***
 ```Python
@@ -223,7 +238,7 @@ if __name__ == "__main__":
 
 ### english version
 
-**BioFilterToolsPro** — is a utility designed to work with DNA and RNA sequences, as well as to filter sequences in FASTQ file based on GC composition, reed length and the threshold value of the average reed quality (phred33 scale).
+**BioFilterToolsPro** — is a utility designed to work with DNA, RNA and protein sequences, as well as to filter sequences in FASTQ file based on GC composition, reed length and the threshold value of the average reed quality (phred33 scale).
 
 **bio_files_processor** - is an additional utility for working with some common biological data formats (FASTA files, output files from the BLAST program in .txt format, genome annotations in .gbk format).
 
@@ -252,7 +267,6 @@ Institute of Bioinformatics, Saint-Petersburg, Russia.
 git clone git@github.com:Cinnamonness/BioFilterToolsPro.git
 cd BioFilterToolsPro
 ```
-The necessary modules for operation (`module_rna_dna_tools`, `module_filter_fastq`) are located inside the directory of this project.
 
 ---
 
@@ -294,96 +308,113 @@ The utility provides three main functions:
 
 ## Requirements
 - Python 3.x
-- Required modules:
-    - `module_rna_dna_tools`
-    - `module_filter_fastq`
+- Required libraries you can see in requirements.txt
 
 ---
 
 ## Example: 
 
-### Working example of `run_dna_rna_tools`
+### Working example with DNA sequence:
 
-if __name__ == "__main__":
-    arguments = ('ATG', 'aT', 'reverse')
-    result = run_dna_rna_tools(*arguments)
-    print("Result of run_dna_rna_tools:", result)
+```Python
+dna = DNASequence("ATGCGA")
+print(dna)
+print(dna[1:4])
+print(dna[1::])
+print(dna.complement())
+print(dna.reverse())
+print(dna.reverse_complement())
+print(dna.transcribe())
 ```
 ```Python
-Result of run_dna_rna_tools: ['GTA', 'Ta']
+Sequence: ATGCGA
+Sequence: TGC
+Sequence: TGCGA
+Sequence: TACGCT
+Sequence: AGCGTA
+Sequence: TCGCAT
+Sequence: AUGCGA
+```
+
+### Working example with RNA sequence:
+```Python
+rna = RNASequence("AUGCGA")
+print(str(rna))        
+print(rna[1:4])
+print(rna[1::])
+print(rna.complement())
+print(rna.reverse())
+print(rna.reverse_complement())
+```
+```Python
+Sequence: AUGCGA
+Sequence: UGC
+Sequence: UGCGA
+Sequence: UACGCU
+Sequence: AGCGUA
+Sequence: UCGCAU
+```
+
+### Working example with protein sequence:
+```Python
+aa_seq = AminoAcidSequence("GALNQRHKTTYCC")
+print(aa_seq)
+print(aa_seq[1:4])
+print(aa_seq[1::])
+print(aa_seq.classify_aminoacids())
+```
+```Python
+Sequence: GALNQRHKTTYCC
+Sequence: ALN
+Sequence: ALNQRHKTTYCC
+non-polar: Count = 3, Percentage = 23.08%
+polar uncharged: Count = 7, Percentage = 53.85%
+polar negatively charged: Count = 0, Percentage = 0.00%
+polar positively charged: Count = 3, Percentage = 23.08%
 ```
 
 ### Working example of `filter_fastq`
-
 ```Python
 if __name__ == "__main__":
-    arguments = ('C:/Users/User/PycharmProjects/some_scripts/example_fastq.fastq', '',
-                 (50, 70), (20,50), 20)
+    arguments = ("../data/example.fastq", 
+             output_fastq='../data/filtered.fastq',
+             gc_bounds=(0, 80),
+             length_bounds=(0, 500),
+             quality_threshold=40)
     result = filter_fastq(*arguments)
 ```
-As a result of running the filter_fastq function, a file named filtered_sequences.fastq containing the filtered sequences from the original file example_fastq.fastq will be saved in the ./filtered directory. If the filtered directory did not previously exist, it will be created in the current directory.
+As a result of running the filter_fastq function, a file named filtered.fastq containing the filtered sequences from the original file example.fastq will be saved in the ./data directory. If the filtered directory did not previously exist, it will be created in the current directory.
 
 ***Original example_fastq.fastq***
 ```Python
-@SRX079804:1:SRR292678:1:1101:278698:278698 1:N:0:1 BH:ok
-CTAATAATGGTAATTGAACCATAGAAGATAAGTTCATAATGTAATAAATACATCCATAGAGTTATTAA
-+SRX079804:1:SRR292678:1:1101:278698:278698 1:N:0:1 BH:ok
-DDBDBCCCDD@FFFB9<<<@DA=DA@B:@=@@AC@GGFCGECFFDGGCGFFGGFFCEBF9>?@>BDFF
-@SRX079804:1:SRR292678:1:1101:918742:918742 1:N:0:1 BH:failed
-CTCTCCATGCACAAAGAATATCACAGCCAAA
-+SRX079804:1:SRR292678:1:1101:918742:918742 1:N:0:1 BH:failed
-EEEBA?@;B@EEE@BEE=?EDDDDADCDA?E
-@SRX079804:1:SRR292678:1:1101:923787:923787 2:N:0:1 BH:ok
-TTGTGAAGGATGGGATATTAGTGTAGATGA
-+SRX079804:1:SRR292678:1:1101:923787:923787 2:N:0:1 BH:ok
-EEBBEGEEE=BBB<@DCDCGD@D>=DEGEE
-@SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-GTCTGCACTATCGAGGGCTGTGCCTTTGC
-+SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-FEFFDBFF8FE>?DFFFCEBCEEBBEDE6
-@SRX079804:1:SRR292678:1:1101:937136:937136 1:N:0:1 BH:failed
-TTTCTTTGGCTTAAAGATAGTTTTAGTC
-+SRX079804:1:SRR292678:1:1101:937136:937136 1:N:0:1 BH:failed
-EFFFEEEEFCBCDDDDE@/E?@@7@@3<
-@SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-TGCCGTGGGAATGACAAACAAGCATCC
-+SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-DECC@GFFBF=EBEAFDFGD?FFF8FF
-@SRX079804:1:SRR292678:1:1101:940693:940693 1:N:0:1 BH:failed
-CACATTATGAACTATGGGCACTGCAT
-+SRX079804:1:SRR292678:1:1101:940693:940693 1:N:0:1 BH:failed
-EEEGFDEDFEGGGGGFEGBGGGFGGG
-@SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-CACCTAGCAGCAACGGACGAGTCAG
-+SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-GGGGGEEEGGEGGGFGEGG;F@EFF
-@SRX079804:1:SRR292678:1:1101:958051:958051 2:N:0:1 BH:ok
-TTAATATTTCCATCTGAACTTCGC
-+SRX079804:1:SRR292678:1:1101:958051:958051 2:N:0:1 BH:ok
-EDDBGFEGFGHHFHGGEDEGBGDB
-@SRX079804:1:SRR292678:1:1101:996098:996098 1:N:0:1 BH:failed
-CTAAGAGAGTTTGTAATGCGGAC
-+SRX079804:1:SRR292678:1:1101:996098:996098 1:N:0:1 BH:failed
-DD=DBDBDC4EFFFD@?CD@ACD
-@SRX079804:1:SRR292678:1:1101:1020278:1020278 2:N:0:1 BH:ok
-AAAGTGCAGAACATGCAGATAT
-+SRX079804:1:SRR292678:1:1101:1020278:1020278 2:N:0:1 BH:ok
-D>AC?GDDCD?DDADE@GABDG
+```Python
+@K00271:89:HHWWNBBXX:2:1101:23277:1068 1:N:0:CAGATC
+NATCGGAAGAGCACACGTCTGAACTCCAGTCACCAGATCATCTCGTATGCCGTCTTCTGCTTGAAAAAAAAAAATCTCAGACAACAAATCACAGAGTTAAGTCAGTTTACCGCACAAACTNACCAAGTCGGCGAAACAGAAGGTGGCGAC
++
+#AAAFFJJFJJFJJJJF-FFFJJFJJJJFJJJJFJJFAFJF-FFJFJFJJJJ7A<FFJJJFAJF<<-JJJFJJF----FA--7-A-7------7A-7----7FJ----7---7-7A-AF-#A<---7---7A-F)-7AA<--77-)--)-
+@K00271:89:HHWWNBBXX:2:1101:16792:1121 1:N:0:CAGATC
+NGGAAACCGTCGGTTCTGGTTGTGGAGGCGGTTGGTGGTGGCTGTGGATTGGGAAGATGGTTTGGTAAGTTTTGGGCCGGTTTCAAGAAACTAAGCTGGGCTGGGCTGGGCTGGGCTGGGCTAAGCTGGGCTCACGAACCAAGTAAAGTT
++
+#AAFFJJJJJJJJJJJJJJFFJFJJJJJFJJ-FFJFFJFJJJJJJJJFFFJJJ<<JF<FJ<FJJJFFJJJJFJJJJJJJJ-AJJFJJJAJJFJJJJFJJJJJJFFJJJJJJFJJJJJJJJJ-AFJFJJJJJFFAJJ-AFJJJFF-7F<77
+@K00271:89:HHWWNBBXX:2:1101:18609:1173 1:N:0:CAGATC
+NTGAACCTCCAAATTGATTAGAGAGTCACATGCAAATCACTGTTAAAGTCCGACAAACAGTTTACAAGTAACTTTAATTGAATGCCCGAAAATCTTTTAAATGTTCAGACAATACGATGACGATGACAGTTATAAGCGAAACCACTGAGA
++
+#AAFFJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FJJJFJFJJJJJJJFJJJJFJJFJJJF
+@K00271:89:HHWWNBBXX:2:1101:19898:1226 1:N:0:CAGATC
+NTGATGACTGTTGCCAAACAATTTGGGAATTCTAGATGGGATTCGAGTTTAGTTTTGGAGTGAGCCTTATAATTTTGGTTCATCAAGGTCAATAAGGATACACTCCCACATTGGTGTTCATTGGGTTAATTTTGGAGTGCCACTCACACC
++
+#AAFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FFJJFFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJAJFJJJJJJJJJJJFJJFJJJJJJJJJJJJJJJJJJ
 ```
 ***Filtered filtered_sequences.fastq***
 ```Python
-@SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-GTCTGCACTATCGAGGGCTGTGCCTTTGC
-+SRX079804:1:SRR292678:1:1101:933189:933189 1:N:0:1 BH:failed
-FEFFDBFF8FE>?DFFFCEBCEEBBEDE6
-@SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-TGCCGTGGGAATGACAAACAAGCATCC
-+SRX079804:1:SRR292678:1:1101:940351:940351 1:N:0:1 BH:changed:1
-DECC@GFFBF=EBEAFDFGD?FFF8FF
-@SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-CACCTAGCAGCAACGGACGAGTCAG
-+SRX079804:1:SRR292678:1:1101:955819:955819 1:N:0:1 BH:failed
-GGGGGEEEGGEGGGFGEGG;F@EFF
+@K00271:89:HHWWNBBXX:2:1101:18609:1173 1:N:0:CAGATC
+NTGAACCTCCAAATTGATTAGAGAGTCACATGCAAATCACTGTTAAAGTCCGACAAACAGTTTACAAGTAACTTTAATTGAATGCCCGAAAATCTTTTAAATGTTCAGACAATACGATGACGATGACAGTTATAAGCGAAACCACTGAGA
++
+#AAFFJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FJJJFJFJJJJJJJFJJJJFJJFJJJF
+@K00271:89:HHWWNBBXX:2:1101:19898:1226 1:N:0:CAGATC
+NTGATGACTGTTGCCAAACAATTTGGGAATTCTAGATGGGATTCGAGTTTAGTTTTGGAGTGAGCCTTATAATTTTGGTTCATCAAGGTCAATAAGGATACACTCCCACATTGGTGTTCATTGGGTTAATTTTGGAGTGCCACTCACACC
++
+#AAFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ<FFJJFFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJAJFJJJJJJJJJJJFJJFJJJJJJJJJJJJJJJJJJ
 ```
 
 ### Working example of `convert_multiline_fasta_to_oneline` from ***bio_files_processor***
