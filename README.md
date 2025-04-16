@@ -150,6 +150,24 @@ if __name__ == "__main__":
 ```
 В результате работы функции `filter_fastq` в директории ./data сохранится файл filtered.fastq с отфильтрованными последовательностями из изначального файла example.fastq. 
 
+Вы также можете вызвать `filter_fastq` из командной строки. Пример для таких же параметров:
+
+``` bash
+python .\BioFilterToolsPro.py -i {path_to_yours_fastq.fastq} -o {output_path.fastq} -gc 80 -len 500 -q 40
+```
+
+*Параметры командной строки:*
+
+* -i/--input: путь к входному FASTQ-файлу
+
+* -o/--output: путь для сохранения отфильтрованного файла
+
+* -gc/--gc_content: границы GC-состава (число или диапазон)
+
+* -len/--length: границы длины (число или диапазон)
+
+* -q/--quality: минимальный порог качества
+
 ***Исходный example_fastq.fastq***
 ```Python
 @K00271:89:HHWWNBBXX:2:1101:23277:1068 1:N:0:CAGATC
@@ -384,6 +402,24 @@ if __name__ == "__main__":
     result = filter_fastq(*arguments)
 ```
 As a result of running the filter_fastq function, a file named filtered.fastq containing the filtered sequences from the original file example.fastq will be saved in the ./data directory. If the filtered directory did not previously exist, it will be created in the current directory.
+
+ Can also be called from command line:
+
+ ``` bash
+python .\BioFilterToolsPro.py -i input.fastq -o output.fastq -gc 80 -len 500 -q 40
+ ```
+
+ *Command line parameters:*
+
+* -i/--input: path to input FASTQ file
+
+* -o/--output: path for filtered output file
+
+* -gc/--gc_content: GC content bounds (number or range)
+
+* -len/--length: length bounds (number or range)
+
+* -q/--quality: minimum quality threshold
 
 ***Original example_fastq.fastq***
 ```Python

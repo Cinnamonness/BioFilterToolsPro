@@ -1,0 +1,17 @@
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Filtering completed. Total sequences: 3, passed sequences: 3 (100.0%)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Filtering completed. Total sequences: 3, passed sequences: 1 (33.3%)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Filtering completed. Total sequences: 3, passed sequences: 1 (33.3%)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Filtering completed. Total sequences: 3, passed sequences: 3 (100.0%)
+ERROR | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Output file 'C:\Users\cinna\AppData\Local\Temp\pytest-of-cinna\pytest-13\test_file_exists_error0\output.fastq' already exists.
+ERROR | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Error during filtering: Output file 'C:\Users\cinna\AppData\Local\Temp\pytest-of-cinna\pytest-13\test_file_exists_error0\output.fastq' already exists.
+Traceback (most recent call last):
+  File "C:\Users\cinna\OneDrive\Desktop\BioFilterToolsPro\src\BioFilterToolsPro.py", line 441, in filter_fastq
+    raise FileExistsError(error_message)
+FileExistsError: Output file 'C:\Users\cinna\AppData\Local\Temp\pytest-of-cinna\pytest-13\test_file_exists_error0\output.fastq' already exists.
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> GC bounds converted to tuple (0, 50.0)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Filtering completed. Total sequences: 3, passed sequences: 2 (66.7%)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Length bounds converted to tuple (0, 50)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Filtering completed. Total sequences: 3, passed sequences: 3 (100.0%)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> GC bounds converted to tuple (0, 50.0)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Length bounds converted to tuple (0, 50)
+INFO | 2025-04-16 18:05:37 --> BioFilterToolsPro filter_fastq --> Filtering completed. Total sequences: 3, passed sequences: 1 (33.3%)
